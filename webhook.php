@@ -1,7 +1,7 @@
 <?php
 
 // LINE Messaging API Access Token
-$accessToken = '';
+$accessToken = '0aLHkBYbvUwyFh+ly4d5ISBPXQuoVbrkP7/5ZwdIDB0XAAaiOli9TwWvitVhe2Su9CpkpZZx9n5gQDG6tNR0Jo+ZeZ5XLty4xUpUr626pJsjqt71b49c8HMnEqMWcBP3v9qCVa5K/xI6pLY+ZS8FFwdB04t89/1O/w1cDnyilFU=';
 
 //-------------------------------------------------
 // 0. Webhook Event Objectの取り込み
@@ -45,11 +45,11 @@ if( $oTail === ' ' ){
 //-------------------------------------------------
 // 3. api.ai 自然対話処理
 //-------------------------------------------------
-$clientAccessToken = '';
+$clientAccessToken = '5ec6d8af4e48423fba8b3da7d536b697';
 $apiUrl = 'https://api.api.ai/v1/query?v=v=20150910';
 $reqBody = [
   'query' => $oWakati,
-  'sessionId' => '',
+  'sessionId' => 'cbd12147-6b35-45bc-8710-020b6b262d15',
   'lang' => 'ja',
 ];
 
