@@ -1,7 +1,13 @@
 <?php
+//json encode
+$setting_json = file_get_contents('secret.json');
+$setting_json = mb_convert_encoding($setting_json, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN');
+$json_arr = json_decode($setting_json,true);
+print($setting_json);
 
 // LINE Messaging API Access Token
-$accessToken = '0aLHkBYbvUwyFh+ly4d5ISBPXQuoVbrkP7/5ZwdIDB0XAAaiOli9TwWvitVhe2Su9CpkpZZx9n5gQDG6tNR0Jo+ZeZ5XLty4xUpUr626pJsjqt71b49c8HMnEqMWcBP3v9qCVa5K/xI6pLY+ZS8FFwdB04t89/1O/w1cDnyilFU=';
+$accessToken = $json_arr["line"]["accessToken"];
+//$accessToken = "IibzzLYaKUjrL9A+twqwvrstb1FJ3xFcXlMkBoJZiGP7+vW5/eb0jGGXgomHHSE42Hif84hsS/Bmll1OF5cD2Kpl5i44/GufXRBJV7HqC/TFXF7pQZOiDk4oK4oLaYooJEGh0DbbDYa26bbAVUjUugdB04t89/1O/w1cDnyilFU=";
 
 //-------------------------------------------------
 // 0. Webhook Event Objectの取り込み
@@ -14,8 +20,13 @@ $text = $eventObj->events[0]->message->text;
 $replyToken = $eventObj->events[0]->replyToken;
 $timeStamp = $eventObj->events[0]->timestamp;
 
+file_put_contents("log.txt",(string)$eventJson);
+
 // Text以外は終了
-if($type != 'text') { exit; }
+if($type != 'text') {
+  print("responce ok");
+  exit;
+  }
 
 //-------------------------------------------------
 // 2. 形態素解析
@@ -40,16 +51,17 @@ if( $oTail === ' ' ){
     /* 末尾の文字の手前までを取り出して、単語とする */
     $oLength = strlen( $oWakati );
     $oWakati   = substr( $oWakati , 0 , $oLength - 1 );
-}
+} 
+
 
 //-------------------------------------------------
 // 3. api.ai 自然対話処理
 //-------------------------------------------------
-$clientAccessToken = '5ec6d8af4e48423fba8b3da7d536b697';
+$clientAccessToken = $json_arr["apiai"]["clientAccessToken"];
 $apiUrl = 'https://api.api.ai/v1/query?v=v=20150910';
 $reqBody = [
   'query' => $oWakati,
-  'sessionId' => 'cbd12147-6b35-45bc-8710-020b6b262d15',
+  'sessionId' => $json_arr["apiai"]["sessionId"],
   'lang' => 'ja',
 ];
 
@@ -70,16 +82,33 @@ $resApiJson = json_decode($resApi);
 
 $resText = $resApiJson->result->fulfillment->speech;
 
-$response = [
-  [
-    'type' => 'text',
-    'text' => $resText
-  ]
-];
+if($resText){
+  print("responce get"); 
+  $response = [
+    [
+      'type' => 'text',
+      'text' => $resText
+    ]
+  ];
+}else{
+  print("responce failed");
+  $response = [
+    [
+      'type' => 'text',
+      'text' => 'Hello'
+    ]
+  ];
+}
 
 //-------------------------------------------------
 // Reply Message送信
 //-------------------------------------------------
+$response = [
+    [
+      'type' => 'text',
+      'text' => 'Hello'
+    ]
+  ];
 $postData = [
     'replyToken' => $replyToken,
     'messages' => $response
@@ -96,3 +125,4 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, array(
     ));
 $result = curl_exec($ch);
 curl_close($ch);
+?>
