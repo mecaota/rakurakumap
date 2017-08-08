@@ -3,7 +3,7 @@
 $setting_json = file_get_contents('secret.json');
 $setting_json = mb_convert_encoding($setting_json, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN');
 $json_arr = json_decode($setting_json,true);
-print($setting_json);
+//file_put_contents("log.txt","");
 
 // LINE Messaging API Access Token
 $accessToken = $json_arr["line"]["accessToken"];
@@ -19,12 +19,13 @@ $type = $eventObj->events[0]->message->type;
 $text = $eventObj->events[0]->message->text;
 $replyToken = $eventObj->events[0]->replyToken;
 $timeStamp = $eventObj->events[0]->timestamp;
-
-file_put_contents("log.txt",(string)$eventJson);
+file_put_contents("log.txt", "\n", FILE_APPEND | LOCK_EX);
+file_put_contents("log.txt", (string)$eventJson, FILE_APPEND | LOCK_EX);
+print($text);
 
 // Text以外は終了
 if($type != 'text') {
-  print("responce ok");
+  print($text);
   exit;
   }
 
@@ -32,6 +33,7 @@ if($type != 'text') {
 // 2. 形態素解析
 //-------------------------------------------------
 // 英文字を小文字化
+/*
 $text = strtolower($text);
 
 // 英数字の全角→半角変換
@@ -44,15 +46,18 @@ foreach ($nodes as $n)
 {
     $oWakati = $oWakati . $n->getSurface() . " ";
 }
+*/
 
+/*
 // 最後の空白を削除
 $oTail   = substr( $oWakati , -1 , 1 );
 if( $oTail === ' ' ){
     /* 末尾の文字の手前までを取り出して、単語とする */
+    /*
     $oLength = strlen( $oWakati );
     $oWakati   = substr( $oWakati , 0 , $oLength - 1 );
 } 
-
+*/
 
 //-------------------------------------------------
 // 3. api.ai 自然対話処理
@@ -60,7 +65,7 @@ if( $oTail === ' ' ){
 $clientAccessToken = $json_arr["apiai"]["clientAccessToken"];
 $apiUrl = 'https://api.api.ai/v1/query?v=v=20150910';
 $reqBody = [
-  'query' => $oWakati,
+  'query' => $text,
   'sessionId' => $json_arr["apiai"]["sessionId"],
   'lang' => 'ja',
 ];
@@ -72,13 +77,18 @@ $headers = [
 $options = [
   'http'=> [
     'method'  => 'POST',
-    'header'  => implode("\r\n", $headers),
+    'header'  => implode('\r\n', $headers),
     'content' => json_encode($reqBody)
   ]
 ];
+
 $stream = stream_context_create($options);
+file_put_contents("log.txt", "\n", FILE_APPEND | LOCK_EX);
+file_put_contents("log.txt", (string)json_encode($options), FILE_APPEND | LOCK_EX);
 $resApi = file_get_contents($apiUrl, false, $stream);
 $resApiJson = json_decode($resApi);
+file_put_contents("log.txt", "\n", FILE_APPEND | LOCK_EX);
+file_put_contents("log.txt", (string)json_encode($resApi), FILE_APPEND | LOCK_EX);
 
 $resText = $resApiJson->result->fulfillment->speech;
 
@@ -95,7 +105,7 @@ if($resText){
   $response = [
     [
       'type' => 'text',
-      'text' => 'Hello'
+      'text' => $text
     ]
   ];
 }
@@ -103,12 +113,6 @@ if($resText){
 //-------------------------------------------------
 // Reply Message送信
 //-------------------------------------------------
-$response = [
-    [
-      'type' => 'text',
-      'text' => 'Hello'
-    ]
-  ];
 $postData = [
     'replyToken' => $replyToken,
     'messages' => $response

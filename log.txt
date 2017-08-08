@@ -1,0 +1,8 @@
+
+
+{"events":[{"type":"message","replyToken":"0cb124485dfe442d9ca61d3ad5cc2be6","source":{"userId":"Uc47165d2978037bc997e4035a5564afa","type":"user"},"timestamp":1502153697636,"message":{"type":"text","id":"6510142520595","text":"sjp"}}]}
+{"http":{"method":"POST","header":"Content-Type: application\/json; charset=UTF-8\\r\\nAuthorization: Bearer6ffefc5b49354edfa5adcdeb7dc98626","content":"{\"query\":\"sjp\",\"sessionId\":\"acee4224-b69f-473c-8949-a033513898a1\",\"lang\":\"ja\"}"}}
+false
+{"events":[{"type":"message","replyToken":"0374c176cf264755a39707f3ac377914","source":{"userId":"Uc47165d2978037bc997e4035a5564afa","type":"user"},"timestamp":1502153702650,"message":{"type":"text","id":"6510142782207","text":"smile"}}]}
+{"http":{"method":"POST","header":"Content-Type: application\/json; charset=UTF-8\\r\\nAuthorization: Bearer6ffefc5b49354edfa5adcdeb7dc98626","content":"{\"query\":\"smile\",\"sessionId\":\"acee4224-b69f-473c-8949-a033513898a1\",\"lang\":\"ja\"}"}}
+false
