@@ -1,4 +1,65 @@
 <?php
+function googleMapsURL($param, $location, $key = null){
+  $url = "https://google.com/maps/";
+  $req_param;
+  $opt_param;
+  $discription;
+  switch($param){
+    case 'pano':
+      $discription = "目的地の周辺の様子をパノラマ画像で確認するにはこちら！\n";
+      $req_param = "@?api=1&map_action=pano";
+      $opt_param = "&viewpoint=".$location;
+      break;
+    case 'map':
+      $discription = "目的地の周辺を地図で確認するにはこちら！\n";
+      $req_param = "@?api=1&map_action=map";
+      $opt_param = "&zoom=18&center=".$location;
+      break;
+    case 'search':
+      $discription = $key."で検索した目的地周辺の様子を確認するにはこちら！\n";
+      $req_param = "search/?api=1";
+      $opt_param = "&query=".$location."+".$key;
+      break;
+    case 'pic':
+      $url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
+      $req_param = '?location='.$location.'&radius=1&key='.$key;
+      $opt_param = '';
+      $map_json = file_get_contents($url.$req_param.$opt_param);
+      $map_json = mb_convert_encoding($map_json, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN');
+      $map_arr = json_decode($map_json,true);
+      file_put_contents("log.txt", "gmap_responce:".$map_arr."\n", FILE_APPEND | LOCK_EX);
+      $url = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=".$map_arr["results"][0]["photos"][0]["photo_reference"]."&key=".$key;
+      $result = $url;
+      return $result;
+  }
+  $result = $discription.$url.$req_param.$opt_param;
+  return $result;
+}
+
+function apiai($clientAccessToken, $sessionId){
+  $apiUrl = 'https://api.api.ai/v1/query?v=v=20150910';
+  $reqBody = [
+    'query' => $text,
+    'sessionId' => $sessionId,
+    'lang' => 'ja',
+  ];
+
+  $headers = [
+    'Content-Type: application/json; charset=UTF-8',
+    'Authorization: Bearer' . $clientAccessToken
+  ];
+  $options = [
+    'http'=> [
+      'method'  => 'POST',
+      'header'  => implode('\r\n', $headers),
+      'content' => json_encode($reqBody)
+    ]
+  ];
+  return $options;
+}
+
+
+
 //json encode
 $setting_json = file_get_contents('secret.json');
 $setting_json = mb_convert_encoding($setting_json, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN');
@@ -7,7 +68,6 @@ $json_arr = json_decode($setting_json,true);
 
 // LINE Messaging API Access Token
 $accessToken = $json_arr["line"]["accessToken"];
-//$accessToken = "IibzzLYaKUjrL9A+twqwvrstb1FJ3xFcXlMkBoJZiGP7+vW5/eb0jGGXgomHHSE42Hif84hsS/Bmll1OF5cD2Kpl5i44/GufXRBJV7HqC/TFXF7pQZOiDk4oK4oLaYooJEGh0DbbDYa26bbAVUjUugdB04t89/1O/w1cDnyilFU=";
 
 //-------------------------------------------------
 // 0. Webhook Event Objectの取り込み
@@ -17,102 +77,56 @@ $eventObj = json_decode($eventJson);
 $userId = $eventObj->events[0]->source->userId;
 $type = $eventObj->events[0]->message->type;
 $text = $eventObj->events[0]->message->text;
+$latitude = $eventObj->events[0]->message->latitude;
+$longitude = $eventObj->events[0]->message->longitude;
 $replyToken = $eventObj->events[0]->replyToken;
 $timeStamp = $eventObj->events[0]->timestamp;
-file_put_contents("log.txt", "\n", FILE_APPEND | LOCK_EX);
-file_put_contents("log.txt", (string)$eventJson, FILE_APPEND | LOCK_EX);
+$reply = "ぬるぽ";
+file_put_contents("log.txt", "line_responce:".$eventJson."\n", FILE_APPEND | LOCK_EX);
 print($text);
 
-// Text以外は終了
-if($type != 'text') {
-  print($text);
-  exit;
-  }
+// typeでswitch
+switch($type){
+  case 'text':
+    $options = apiai($json_arr["apiai"]["clientAccessToken"], $json_arr["apiai"]["sessionId"]);
+    $stream = stream_context_create($options);
+    $resApi = file_get_contents($apiUrl, false, $stream);
+    $resApiJson = json_decode($resApi);
+    $resText = $resApiJson->result->fulfillment->speech;
 
-//-------------------------------------------------
-// 2. 形態素解析
-//-------------------------------------------------
-// 英文字を小文字化
-/*
-$text = strtolower($text);
+    if($resText){
+      print("responce get"); 
+      $reply = $resText;
+    }else{
+      print("responce failed");
+      $reply = $text;
+    }
+    break;
 
-// 英数字の全角→半角変換
-$text	= mb_convert_kana($text, "aKHsV", "utf-8");
-
-// mecabによる形態素解析
-$mecab = new \MeCab\Tagger();
-$nodes = $mecab->parseToNode($text);
-foreach ($nodes as $n)
-{
-    $oWakati = $oWakati . $n->getSurface() . " ";
-}
-*/
-
-/*
-// 最後の空白を削除
-$oTail   = substr( $oWakati , -1 , 1 );
-if( $oTail === ' ' ){
-    /* 末尾の文字の手前までを取り出して、単語とする */
-    /*
-    $oLength = strlen( $oWakati );
-    $oWakati   = substr( $oWakati , 0 , $oLength - 1 );
-} 
-*/
-
-//-------------------------------------------------
-// 3. api.ai 自然対話処理
-//-------------------------------------------------
-$clientAccessToken = $json_arr["apiai"]["clientAccessToken"];
-$apiUrl = 'https://api.api.ai/v1/query?v=v=20150910';
-$reqBody = [
-  'query' => $text,
-  'sessionId' => $json_arr["apiai"]["sessionId"],
-  'lang' => 'ja',
-];
-
-$headers = [
-  'Content-Type: application/json; charset=UTF-8',
-  'Authorization: Bearer' . $clientAccessToken
-];
-$options = [
-  'http'=> [
-    'method'  => 'POST',
-    'header'  => implode('\r\n', $headers),
-    'content' => json_encode($reqBody)
-  ]
-];
-
-$stream = stream_context_create($options);
-file_put_contents("log.txt", "\n", FILE_APPEND | LOCK_EX);
-file_put_contents("log.txt", (string)json_encode($options), FILE_APPEND | LOCK_EX);
-$resApi = file_get_contents($apiUrl, false, $stream);
-$resApiJson = json_decode($resApi);
-file_put_contents("log.txt", "\n", FILE_APPEND | LOCK_EX);
-file_put_contents("log.txt", (string)json_encode($resApi), FILE_APPEND | LOCK_EX);
-
-$resText = $resApiJson->result->fulfillment->speech;
-
-if($resText){
-  print("responce get"); 
-  $response = [
-    [
-      'type' => 'text',
-      'text' => $resText
-    ]
-  ];
-}else{
-  print("responce failed");
-  $response = [
-    [
-      'type' => 'text',
-      'text' => $text
-    ]
-  ];
+  case 'location':
+    $location = $latitude.",".$longitude;
+    $reply = googleMapsURL("map", $location)."\n".googleMapsURL("pano",$location);
+    break;
 }
 
 //-------------------------------------------------
 // Reply Message送信
 //-------------------------------------------------
+file_put_contents("log.txt", "reply_text:".($reply)."\n", FILE_APPEND | LOCK_EX);
+$response = [
+    [
+      'type' => 'text',
+      'text' => $reply
+    ]
+  ];
+$image_responce = [
+  [
+    'type' => 'image',
+    'originalContentUrl' => googleMapsURL("pic", $location, $json_arr["googlemap"]["apikey"]),
+    'previewImageUrl'=> googleMapsURL("pic", $location, $json_arr["googlemap"]["apikey"])
+  ]
+];
+
 $postData = [
     'replyToken' => $replyToken,
     'messages' => $response

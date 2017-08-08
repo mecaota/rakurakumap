@@ -1,8 +1,19 @@
-
-
-{"events":[{"type":"message","replyToken":"0cb124485dfe442d9ca61d3ad5cc2be6","source":{"userId":"Uc47165d2978037bc997e4035a5564afa","type":"user"},"timestamp":1502153697636,"message":{"type":"text","id":"6510142520595","text":"sjp"}}]}
-{"http":{"method":"POST","header":"Content-Type: application\/json; charset=UTF-8\\r\\nAuthorization: Bearer6ffefc5b49354edfa5adcdeb7dc98626","content":"{\"query\":\"sjp\",\"sessionId\":\"acee4224-b69f-473c-8949-a033513898a1\",\"lang\":\"ja\"}"}}
-false
-{"events":[{"type":"message","replyToken":"0374c176cf264755a39707f3ac377914","source":{"userId":"Uc47165d2978037bc997e4035a5564afa","type":"user"},"timestamp":1502153702650,"message":{"type":"text","id":"6510142782207","text":"smile"}}]}
-{"http":{"method":"POST","header":"Content-Type: application\/json; charset=UTF-8\\r\\nAuthorization: Bearer6ffefc5b49354edfa5adcdeb7dc98626","content":"{\"query\":\"smile\",\"sessionId\":\"acee4224-b69f-473c-8949-a033513898a1\",\"lang\":\"ja\"}"}}
-false
+line_responce:
+reply_text:ぬるぽ
+line_responce:{"events":[{"type":"message","replyToken":"53a78ed9b0a84225805bc42fdce3fd29","source":{"userId":"Uc47165d2978037bc997e4035a5564afa","type":"user"},"timestamp":1502167215426,"message":{"type":"location","id":"6511013288246","title":"位置情報","address":"日本, 〒274-0824 千葉県船橋市前原東１丁目１３−８","latitude":35.69122,"longitude":140.027962}}]}
+gmap_responce:https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=35.69122,140.027962&radius=1&key=AIzaSyA-LsHZIbirCwYBD4q-lxxDN4o9_0ay0o4
+gmap_responce:Array
+reply_text:https://maps.googleapis.com/maps/api/place/photo?photoreference=&key=AIzaSyA-LsHZIbirCwYBD4q-lxxDN4o9_0ay0o4
+目的地の周辺を地図で確認するにはこちら！
+https://google.com/maps/@?api=1&map_action=map&zoom=18&center=35.69122,140.027962
+目的地の周辺の様子をパノラマ画像で確認するにはこちら！
+https://google.com/maps/@?api=1&map_action=pano&viewpoint=35.69122,140.027962
+line_responce:
+reply_text:ぬるぽ
+line_responce:{"events":[{"type":"message","replyToken":"d29a515441f24ef5a4106ecf6b86b10c","source":{"userId":"Uc47165d2978037bc997e4035a5564afa","type":"user"},"timestamp":1502168262568,"message":{"type":"location","id":"6511084978237","title":"位置情報","address":"日本, 〒273-0031 千葉県船橋市西船４丁目２３−１２ 九州の旨かもんくすお","latitude":35.709053,"longitude":139.95893}}]}
+gmap_responce:Array
+reply_text:https://maps.googleapis.com/maps/api/place/photo?&key=AIzaSyA-LsHZIbirCwYBD4q-lxxDN4o9_0ay0o4&photoreference=CmRaAAAA4ycZ4rAobc-sKdMA_ohdzVIi_ReLLu8BIuK2ZoWx1win2eLaNhQWtM2w4V_9zUJjCBhedAETfT7-iAR6FGxS-JD-ZijwF0jeBDQ6aNovD41ZyF7--HCtcD3Ol8ofjQ-tEhBLOGDGm_ucLC0DPNTr3T2QGhQrw1SE0j6HwEIqQLE8lOunuyBo9w
+目的地の周辺を地図で確認するにはこちら！
+https://google.com/maps/@?api=1&map_action=map&zoom=18&center=35.709053,139.95893
+目的地の周辺の様子をパノラマ画像で確認するにはこちら！
+https://google.com/maps/@?api=1&map_action=pano&viewpoint=35.709053,139.95893
