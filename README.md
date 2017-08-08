@@ -1,6 +1,5 @@
 # rakurakumap
 
-## LINEID:@rxb9131d 
+![LINE](1A1a-Zjcvi.png)
 
-![LINE@](http://qr-official.line.me/L/1A1a-Zjcvi.png "line@")
-
+## LINEID:[@rxb9131d](https://line.me/R/ti/p/%40rxb9131d)
