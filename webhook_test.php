@@ -58,7 +58,8 @@ function apiai($clientAccessToken, $sessionId){
   return $options;
 }
 
-
+//フラグ
+$flag = 0;
 
 //json encode
 $setting_json = file_get_contents('secret.json');
@@ -101,9 +102,11 @@ switch($type){
       print("responce failed");
       $reply = $text;
     }
+    $flag = 0;
     break;
 
   case 'location':
+    $flag=1;
     $location = $latitude.",".$longitude;
     $reply = googleMapsURL("map", $location)."\n".googleMapsURL("pano",$location);
     break;
@@ -113,23 +116,35 @@ switch($type){
 // Reply Message送信
 //-------------------------------------------------
 file_put_contents("log.txt", "reply_text:".($reply)."\n", FILE_APPEND | LOCK_EX);
-$response = [
+if($flag==1){
+  if($text=="画像"){
+    $responce = [
+      [
+        'type' => 'image',
+        'originalContentUrl' => googleMapsURL("pic", $location, $json_arr["googlemap"]["apikey"]),
+        'previewImageUrl'=> googleMapsURL("pic", $location, $json_arr["googlemap"]["apikey"])
+      ]
+    ];
+    $flag =0;
+  }elseif($text=="横浜"){
+$responce = [
+      [
+        'type' => 'image',
+        'originalContentUrl' => "yokohama.png",
+        'previewImageUrl'=> "yokohama.png"
+      ]
+    ];
+  }
+}else{
+  $response = [
     [
       'type' => 'text',
       'text' => $reply
     ]
   ];
-$yokohama_responce = [
-  [
-    'type' => 'image',
-    'originalContentUrl' => "https://bot.technotan.net/mapbot/yokohama.png",
-    'previewImageUrl'=> "https://bot.technotan.net/mapbot/yokohama.png"
-  ]
-];
-if($text=="横浜"){
-  $yokohama = "35.4596665,139.6232647";
-  $response = $yokohama_responce;
+  $flag =1;
 }
+
 $postData = [
     'replyToken' => $replyToken,
     'messages' => $response
